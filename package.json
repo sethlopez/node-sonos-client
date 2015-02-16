@@ -23,5 +23,8 @@
   "bugs": {
     "url": "https://github.com/sethlopezme/node-sonos-client/issues"
   },
-  "homepage": "https://github.com/sethlopezme/node-sonos-client"
+  "homepage": "https://github.com/sethlopezme/node-sonos-client",
+  "dependencies": {
+    "xml2js": "^0.4.5"
+  }
 }
