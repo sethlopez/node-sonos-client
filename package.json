@@ -1,11 +1,8 @@
 {
   "name": "node-sonos-client",
   "version": "0.0.1",
-  "description": "A NodeJS client for controlling Sonos wireless speakers.",
+  "description": "A simple NodeJS client for programmatically controlling Sonos wireless speakers within a network.",
   "main": "index.js",
-  "scripts": {
-    "test": ""
-  },
   "repository": {
     "type": "git",
     "url": "https://github.com/sethlopezme/node-sonos-client.git"
@@ -13,10 +10,11 @@
   "keywords": [
     "sonos",
     "client",
-    "speakers",
+    "controller",
+    "speaker",
     "wireless",
-    "sound",
-    "music"
+    "music",
+    "sound"
   ],
   "author": "Seth Lopez <seth@sethlopez.me>",
   "license": "MIT",
@@ -25,6 +23,7 @@
   },
   "homepage": "https://github.com/sethlopezme/node-sonos-client",
   "dependencies": {
+    "babel": "^5.8.3",
     "xml2js": "^0.4.5"
   }
 }
