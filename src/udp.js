@@ -1,7 +1,7 @@
-import util from 'util';
 import EventEmitter from 'events';
+import util from 'util';
 import dgram from 'dgram';
-import {SSDPError} from './errors';
+import {UDPError} from './errors';
 
 const MULTICAST_IP = '239.255.255.250';
 const MULTICAST_PORT = 1900;
@@ -12,7 +12,7 @@ const SEARCH_MX = 3;
  *       M-Search on an interval.
  */
 
-export default class SSDP extends EventEmitter {
+export default class UDP extends EventEmitter {
   constructor() {
     super();
   }

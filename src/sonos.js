@@ -1,7 +1,7 @@
 import util from 'util';
 import EventEmitter from 'events';
 import {SonosError} from './errors';
-import SSDP from './ssdp';
+import UDP from './udp';
 import Device from './device';
 
 const _devices = {};
@@ -19,10 +19,10 @@ export default class Sonos extends EventEmitter {
    * Gets things rolling by starting SSDP.
    */
   start() {
-    const ssdp = new SSDP();
+    const udp = new UDP();
 
-    ssdp.on('found', onSSDPSearchFound.bind(this));
-    ssdp.start();
+    udp.on('found', onSSDPSearchFound.bind(this));
+    udp.start();
 
     this.emit('ready');
     util.log('Sonos ready');
@@ -82,7 +82,7 @@ function onSSDPSearchFound(deviceInfo) {
   if (!this.getDevice(deviceInfo.ip)) {
     const device = new Device(deviceInfo);
 
-    this.emit('ssdp/search/found', device);
+    this.emit('udp/search/found', device);
 
     device.on('ready', onDeviceReady.bind(this, device));
     device.on('error', onDeviceError.bind(this));

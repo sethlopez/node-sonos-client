@@ -1,7 +1,7 @@
 export default class CustomError extends Error {
   constructor(message) {
     super(message);
-    
+
     this.message = message;
     Error.captureStackTrace(this, this.constructor);
   }
@@ -17,7 +17,7 @@ export class SonosError extends CustomError {
   }
 }
 
-export class SSDPError extends CustomError {
+export class UDPError extends CustomError {
   constructor(message) {
     super(message);
   }

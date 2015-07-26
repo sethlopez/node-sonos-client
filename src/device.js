@@ -161,7 +161,7 @@ export default class Device extends EventEmitter {
     return upnp.post(this.address, action, data)
       .then(response => response)
       .catch((error) => {
-        this.emit('error', new DeviceError(`${action}: ${error.message}`);
+        this.emit('error', new DeviceError(`${action}: ${error.message}`));
       });
   }
 }
