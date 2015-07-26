@@ -12,8 +12,8 @@ As of yet, this package doesn't appear on NPM. I'd like to get it to a better pl
 
 ## Goals
 
-- Discovery of all Sonos devices on the network.
-- Support for device actions.
+- [x] Discovery of all Sonos devices on the network.
+- [ ] Support for device actions.
     - [x] `GetMute`
     - [x] `SetMute`
     - [ ] `ResetBasicEQ`
@@ -39,7 +39,7 @@ As of yet, this package doesn't appear on NPM. I'd like to get it to a better pl
     - [ ] `CreateStereoPair`
     - [ ] `SeparateStereoPair`
     - ...
-- Support for zone and transport actions.
+- [ ] Support for zone and transport actions.
     - [ ] `SetAVTransportURI`
     - [ ] `SetNextAVTransportURI`
     - [x] `GetMediaInfo`
@@ -65,7 +65,7 @@ As of yet, this package doesn't appear on NPM. I'd like to get it to a better pl
     - [ ] `ChangeTransportSettings`
     - [ ] `StartAutoplay`
     - ...
-- Support for playlist management.
+- [ ] Support for playlist management.
     - [ ] `AddURIToQueue`
     - [ ] `AddMultipleURIsToQueue`
     - [ ] `ReorderTracksInQueue`
@@ -77,9 +77,9 @@ As of yet, this package doesn't appear on NPM. I'd like to get it to a better pl
     - [ ] `CreateSavedQueue`
     - [ ] `AddURIToSavedQueue`
     - [ ] `ReorderTracksInSavedQueue`
-- Support for alarms.
+- [ ] Support for alarms.
     - ...
-- Support for multiple music services. _Not sure if this is in scope._
+- [ ] Support for multiple music services. _Not sure if this is in scope._
     - [ ] Spotify
     - [ ] Tidal
     - ...
