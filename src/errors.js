@@ -11,12 +11,6 @@ export default class CustomError extends Error {
   }
 }
 
-export class SonosError extends CustomError {
-  constructor(message) {
-    super(message);
-  }
-}
-
 export class UDPError extends CustomError {
   constructor(message) {
     super(message);
@@ -29,7 +23,19 @@ export class UPnPError extends CustomError {
   }
 }
 
-export class DeviceError extends CustomError {
+export class ServiceError extends CustomError {
+  constructor(message) {
+    super(message);
+  }
+}
+
+export class PlayerError extends CustomError {
+  constructor(message) {
+    super(message);
+  }
+}
+
+export class SonosError extends CustomError {
   constructor(message) {
     super(message);
   }

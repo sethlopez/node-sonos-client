@@ -44,16 +44,17 @@ export default class UPnP {
           });
         });
       }).on('error', (error) => {
+        console.log('http.get error');
         reject(new UPnPError(error.message));
       });
     });
   }
 
-  static post(ip, action, data) {
+  static post(address, action, data) {
     const {endpoint, service} = soapLookup(action);
     const payload = envelop(data, action, service);
     const options = {
-      host: ip,
+      host: address,
       port: 1400,
       method: 'POST',
       path: endpoint,

@@ -2,9 +2,10 @@ import util from 'util';
 import EventEmitter from 'events';
 import {SonosError} from './errors';
 import UDP from './udp';
-import Device from './device';
+import Player from './player';
 
-const _devices = {};
+const _players = {};
+const _rooms = {};
 
 /**
  * Handles discovery of Sonos devices and acts as a directory for all of the
@@ -35,8 +36,8 @@ export default class Sonos extends EventEmitter {
    *
    * @returns  {Object|Null}      The device with the given IP address.
    */
-  getDevice(ip) {
-    return _devices[ip] || null;
+  getPlayer(address) {
+    return _players[address] || null;
   }
 
   /**
@@ -44,8 +45,20 @@ export default class Sonos extends EventEmitter {
    *
    * @returns  {Object}  All of the discovered devices.
    */
-  getAllDevices() {
-    return _devices;
+  getAllPlayers() {
+    return _players;
+  }
+
+  getRoom(room) {
+    return _rooms[room] || null;
+  }
+
+  getRoomByPlayer(address) {
+    return _rooms[_players[address].roomName] || null;
+  }
+
+  getAllRooms() {
+    return _rooms;
   }
 
   /**
@@ -55,8 +68,8 @@ export default class Sonos extends EventEmitter {
    *
    * @returns  {[type]}      [description]
    */
-  removeDevice(ip) {
-    delete _devices[ip];
+  removePlayer(address) {
+    delete _players[address];
   }
 
   /**
@@ -64,46 +77,45 @@ export default class Sonos extends EventEmitter {
    *
    * @param  {Object}  device  The device to add.
    */
-  addDevice(device) {
-    if (!this.getDevice(device.ip)) {
-      _devices[device.ip] = device;
+  addPlayer(player) {
+    if (!this.getPlayer(player.address)) {
+      _players[player.address] = player;
     }
   }
 }
 
 /**
- * Handles creating initializing a new device when a Sonos device is found on
- * the network.
+ * Handles initializing a new player when it is found on the network.
  *
- * @param    {Object}  deviceInfo  The IP address and device description URL of
- *                                 the device.
+ * @param    {Object}  playerInfo  The IP address and description URL of the
+ *                                 player.
  */
-function onSSDPSearchFound(deviceInfo) {
-  if (!this.getDevice(deviceInfo.ip)) {
-    const device = new Device(deviceInfo);
+function onSSDPSearchFound(playerInfo) {
+  if (!this.getPlayer(playerInfo.address)) {
+    const player = new Player(playerInfo);
 
-    this.emit('udp/search/found', device);
-
-    device.on('ready', onDeviceReady.bind(this, device));
-    device.on('error', onDeviceError.bind(this));
+    player.on('ready', onPlayerReady.bind(this, player));
+    player.on('error', onPlayerError.bind(this));
+    player.init();
   }
 }
 
 /**
- * Handles adding a new device once the device has been initialized.
+ * Handles adding a new player once it has been initialized.
  *
- * @param    {Object}  device  The device to add.
+ * @param    {Object}  player  The player to add.
  */
-function onDeviceReady(device) {
-  this.emit('device/ready', device);
-  this.addDevice(device);
+function onPlayerReady(player) {
+  this.emit('player/ready', player);
+  this.addPlayer(player);
 }
 
 /**
- * Handles any errors that occur with devices.
+ * Handles any errors that occur with players.
  *
- * @param    {Error}  error  The error thrown by the device.
+ * @param    {Error}  error  The error thrown by the player.
  */
-function onDeviceError(error) {
-  util.log(error);
+function onPlayerError(error) {
+  // util.log(error);
+  console.log(error.stack);
 }

@@ -1,28 +1,45 @@
 import EventEmitter from 'events';
 import http from 'http';
 import util from 'util';
-import {DeviceError} from './errors';
 import upnp from './upnp';
+import {PlayerError} from './errors';
+import {MediaRenderer, MediaServer} from './devices';
+import {AlarmClock, DeviceProperties, GroupManagement, MusicServices, SystemProperties, QPlay, ZoneGroupTopology} from './services';
 
 /**
  * Represents a Sonos device and allows us to call actions for that device.
  */
-export default class Device extends EventEmitter {
-  constructor(deviceInfo) {
+export default class Player extends EventEmitter {
+  constructor(playerInfo) {
     super();
 
     // seed the device object with the known ip and device description url
-    Object.assign(this, deviceInfo);
+    Object.assign(this, playerInfo);
 
+    this.mediaRenderer = new MediaRenderer();
+    this.mediaServer = new MediaServer();
+
+    this.services = Object.assign({}, {
+      alarmClock: new AlarmClock(),
+      deviceProperties: new DeviceProperties(),
+      groupManagement: new GroupManagement(),
+      musicServices: new MusicServices(),
+      systemProperties: new SystemProperties(),
+      qplay: new QPlay(),
+      zoneGroupTopology: new ZoneGroupTopology()
+    });
+  }
+
+  init() {
     // query the device for its description
-    upnp.get(this.location)
+    upnp.get(this.description)
       .then((response) => {
         Object.assign(this, response.device);
 
         this.refresh();
         this.emit('ready');
       })
-      .catch((error) => { this.emit('error', new DeviceError(error.message)); });
+      .catch((error) => { this.emit('error', new PlayerError(error.message)); });
   }
 
   /**
@@ -161,7 +178,7 @@ export default class Device extends EventEmitter {
     return upnp.post(this.address, action, data)
       .then(response => response)
       .catch((error) => {
-        this.emit('error', new DeviceError(`${action}: ${error.message}`));
+        this.emit('error', new PlayerError(`${action}: ${error.message}`));
       });
   }
 }

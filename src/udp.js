@@ -47,7 +47,7 @@ export default class UDP extends EventEmitter {
     this.emit('search/start');
 
     setTimeout(() => {
-      this.emit('search/complete')
+      this.emit('search/complete');
     }, 3000);
   }
 }
@@ -69,7 +69,7 @@ function parseMessage(message) {
             parsed.type = 'search';
             break;
           case 'NOTIFY':
-            parsed.type = 'notify';
+            parsed.type = 'notification';
             break;
           default:
             parsed.type = 'found';
@@ -90,19 +90,16 @@ function onListening() {
 function onMessage(message, rinfo) {
   const parsed = parseMessage(message);
 
-  if (/sonos/i.test(parsed.server)) {
-    switch (parsed.type) {
-      case 'found':
-        this.emit('found', {
-          address: rinfo.address,
-          location: parsed.location
-        });
-        break;
-      case 'notify':
-        this.emit('notify', parsed);
-        break;
-      default:
-        break;
+  // searches won't include a server header, so they are filtered out
+  // automatically for us
+  if (parsed.server && /sonos/i.test(parsed.server)) {
+    if (parsed.type === 'found') {
+      this.emit('found', {
+        address: rinfo.address,
+        description: parsed.location
+      });
+    } else if (parsed.type === 'notification') {
+      this.emit('notification', parsed, rinfo);
     }
   }
 }
