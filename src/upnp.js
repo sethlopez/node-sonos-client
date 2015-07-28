@@ -1,6 +1,6 @@
 import http from 'http';
 import {UPnPError} from './errors';
-import * as xml2js from 'xml2js';
+import xml2js from 'xml2js';
 
 let xmlParser = new xml2js.Parser({
   trim: true,           // trim the whitespace from values
@@ -37,6 +37,7 @@ export default class UPnP {
         response.on('end', () => {
           xmlParser.parseString(response.body, (error, result) => {
             if (error) {
+              console.log('xmlParser error');
               reject(new UPnPError(error));
             } else {
               resolve(result);
@@ -50,16 +51,15 @@ export default class UPnP {
     });
   }
 
-  static post(address, action, data) {
-    const {endpoint, service} = soapLookup(action);
-    const payload = envelop(data, action, service);
+  static post(address, endpoint, serviceType, action, data) {
+    const payload = envelop(serviceType, action, data);
     const options = {
       host: address,
       port: 1400,
       method: 'POST',
       path: endpoint,
       headers: {
-        'SOAPAction': `${service}#${action}`,
+        'SOAPAction': `${serviceType}#${action}`,
         'Content-Type': 'text/xml; charset=utf8',
         'Content-Length': payload.length
       }
@@ -72,6 +72,7 @@ export default class UPnP {
         response.on('end', () => {
           xmlParser.parseString(response.body, (error, result) => {
             if (error) {
+              console.log('xmlParser error');
               reject(new UPnPError(error));
             } else {
               if (result.hasOwnProperty('s:Body') && !result['s:Body'].hasOwnProperty('s:Fault') && result['s:Body'].hasOwnProperty(`u:${action}Response`)) {
@@ -83,7 +84,8 @@ export default class UPnP {
           });
         });
       }).on('error', (error) => {
-        reject(new UPnP(error));
+        console.log('http.request error');
+        reject(error);
       });
 
       request.write(payload);
@@ -92,58 +94,9 @@ export default class UPnP {
   }
 }
 
-function soapLookup(action) {
-  const soap = {};
-
-  switch (action) {
-    // DeviceProperties
-    case 'GetLEDState':
-    case 'SetLEDState':
-      soap.endpoint = '/DeviceProperties/Control';
-      soap.service = 'urn:schemas-upnp-org:service:DeviceProperties:1';
-      break;
-    // SystemProperties
-    case 'SetString':
-      break;
-    // RederingControl
-    case 'GetVolume':
-    case 'SetVolume':
-    case 'GetMute':
-    case 'SetMute':
-      soap.endpoint = '/MediaRenderer/RenderingControl/Control';
-      soap.service = 'urn:schemas-upnp-org:service:RenderingControl:1';
-      break;
-    // AVTransport
-    case 'GetMediaInfo':
-    case 'GetTransportInfo':
-    case 'GetPositionInfo':
-    case 'GetDeviceCapabilities':
-    case 'GetTransportSettings':
-    case 'GetCrossfadeMode':
-    case 'SetPlayMode':
-    case 'SetCrossfadeMode':
-    case 'Play':
-    case 'Pause':
-    case 'Stop':
-    case 'Seek':
-    case 'Next':
-    case 'Previous':
-    case 'GetCurrentTransportActions':
-    case 'ChangeTransportSettings':
-      soap.endpoint = '/MediaRenderer/AVTransport/Control';
-      soap.service = 'urn:schemas-upnp-org:service:AVTransport:1';
-      break;
-    default:
-      throw new Error(`${action} is not a valid SOAP action.`);
-      break;
-  }
-
-  return soap;
-}
-
-function envelop(data, action, service) {
-  const actionKey = `u:${action}`;
-  const actionObject = {
+function envelop(serviceType, action, data) {
+  const tagName = `u:${action}`;
+  const xmlData = {
     // these attributes will go on the root node
     '$': {
       'xmlns:s': 'http://schemas.xmlsoap.org/soap/envelope/',
@@ -153,11 +106,13 @@ function envelop(data, action, service) {
     's:Body': {}
   };
 
-  actionObject['s:Body'][actionKey] = Object.assign({}, data, {
+  xmlData['s:Body'][tagName] = Object.assign({}, data, {
     '$': {
-      'xmlns:u': service
+      'xmlns:u': serviceType
     }
   });
 
-  return xmlBuilder.buildObject(actionObject);
+  console.log(JSON.stringify(xmlData, null, 2));
+
+  return xmlBuilder.buildObject(xmlData);
 }

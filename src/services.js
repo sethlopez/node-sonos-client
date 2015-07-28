@@ -1,14 +1,29 @@
-// only way to get these exports to work at the moment is to export the import
-// as their name - not ideal
-export {AlarmClock as AlarmClock} from './services/alarm-clock';
-export {AVTransport as AVTransport} from './services/av-transport';
-export {ConnectionManager as ConnectionManager} from './services/connection-manager';
-export {ContentDirectory as ContentDirectory} from './services/content-directory';
-export {DeviceProperties as DeviceProperties} from './services/device-properties';
-export {GroupRenderingControl as GroupRenderingControl} from './services/group-rendering-control';
-export {MusicServices as MusicServices} from './services/music-services';
-export {QPlay as QPlay} from './services/qplay';
-export {Queue as Queue} from './services/queue';
-export {RenderingControl as RenderingControl} from './services/rendering-control';
-export {SystemProperties as SystemProperties} from './services/system-properties';
-export {ZoneGroupTopology as ZoneGroupTopology} from './services/zone-group-topology';
+import AlarmClock from './services/alarm-clock';
+import AVTransport from './services/av-transport';
+import ConnectionManager from './services/connection-manager';
+import ContentDirectory from './services/content-directory';
+import DeviceProperties from './services/device-properties';
+import GroupManagement from './services/group-management';
+import GroupRenderingControl from './services/group-rendering-control';
+import MusicServices from './services/music-services';
+import QPlay from './services/qplay';
+import Queue from './services/queue';
+import RenderingControl from './services/rendering-control';
+import SystemProperties from './services/system-properties';
+import ZoneGroupTopology from './services/zone-group-topology';
+
+export default {
+  AlarmClock,
+  AVTransport,
+  ConnectionManager,
+  ContentDirectory,
+  DeviceProperties,
+  GroupManagement,
+  GroupRenderingControl,
+  MusicServices,
+  QPlay,
+  Queue,
+  RenderingControl,
+  SystemProperties,
+  ZoneGroupTopology
+};

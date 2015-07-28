@@ -13,33 +13,35 @@ export default class Player extends EventEmitter {
   constructor(playerInfo) {
     super();
 
-    // seed the device object with the known ip and device description url
+    // seed the device object with the known ip and description location
     Object.assign(this, playerInfo);
-
-    this.mediaRenderer = new MediaRenderer();
-    this.mediaServer = new MediaServer();
-
-    this.services = Object.assign({}, {
-      alarmClock: new AlarmClock(),
-      deviceProperties: new DeviceProperties(),
-      groupManagement: new GroupManagement(),
-      musicServices: new MusicServices(),
-      systemProperties: new SystemProperties(),
-      qplay: new QPlay(),
-      zoneGroupTopology: new ZoneGroupTopology()
-    });
   }
 
   init() {
-    // query the device for its description
+    // query the device for its description information
     upnp.get(this.description)
       .then((response) => {
         Object.assign(this, response.device);
 
+        // player services
+        this.alarmClock = new AlarmClock(this);
+        this.deviceProperties = new DeviceProperties(this);
+        this.groupManagement = new GroupManagement(this);
+        this.musicServices = new MusicServices(this);
+        this.systemProperties = new SystemProperties(this);
+        this.qplay = new QPlay(this);
+        this.zoneGroupTopology = new ZoneGroupTopology(this);
+
+        // player devices
+        this.mediaRenderer = new MediaRenderer(this);
+        this.mediaServer = new MediaServer(this);
+
+        // give the player a fresh start
         this.refresh();
+
         this.emit('ready');
       })
-      .catch((error) => { this.emit('error', new PlayerError(error.message)); });
+      .catch((error) => { this.emit('error', error); });
   }
 
   /**
@@ -61,6 +63,14 @@ export default class Player extends EventEmitter {
   expire() {
     this.expireTimeout = null;
     this.emit('expired');
+  }
+
+  setLEDState(state) {
+    return this.deviceProperties.setLEDState(state);
+  }
+
+  getLEDState() {
+    return this.deviceProperties.getLEDState();
   }
 
   getVolume(InstanceID = 0, Channel = 'Master') {
@@ -175,10 +185,6 @@ export default class Player extends EventEmitter {
   }
 
   _doAction(action, data) {
-    return upnp.post(this.address, action, data)
-      .then(response => response)
-      .catch((error) => {
-        this.emit('error', new PlayerError(`${action}: ${error.message}`));
-      });
+    return upnp.post(this.address, action, data);
   }
 }
